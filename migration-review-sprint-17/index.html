@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Product Migration Review</title>
+  <style>
+    :root {
+      --bg: #0b0c10;
+      --surface: rgba(255, 255, 255, 0.08);
+      --text: #ffffff;
+      --muted: rgba(255, 255, 255, 0.68);
+      --accent: #4fb0ff;
+      --shadow: rgba(0, 0, 0, 0.35);
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background: radial-gradient(circle at 20% 20%, rgba(79, 176, 255, 0.16), transparent 55%),
+                  radial-gradient(circle at 80% 60%, rgba(52, 211, 153, 0.14), transparent 55%),
+                  var(--bg);
+      color: var(--text);
+      overflow: hidden;
+    }
+
+    .slides {
+      height: 100vh;
+      display: grid;
+      grid-template-columns: repeat(var(--count), 100vw);
+      scroll-snap-type: x mandatory;
+      overflow-x: auto;
+      scroll-behavior: smooth;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .slide {
+      width: 100vw;
+      height: 100vh;
+      padding: 56px 48px 64px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      gap: 24px;
+      scroll-snap-align: start;
+      position: relative;
+    }
+
+    .slide::before {
+      content: attr(data-title);
+      position: absolute;
+      top: 20px;
+      left: 48px;
+      font-size: 12px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    h1 {
+      font-size: clamp(36px, 6vw, 64px);
+      line-height: 1.05;
+      margin: 0;
+    }
+
+    h2 {
+      font-size: clamp(28px, 4vw, 46px);
+      margin: 0;
+    }
+
+    .subtitle {
+      font-size: clamp(18px, 2.5vw, 24px);
+      opacity: 0.9;
+      margin: 0;
+    }
+
+    p, li {
+      font-size: 17px;
+      line-height: 1.55;
+      margin: 0;
+    }
+
+    li {
+      margin-bottom: 0.75rem;
+    }
+
+    /* Más separación en slide "Entregado" */
+    .slide[data-title="Entregado"] .card ul li {
+      margin-bottom: 1.6rem;
+      line-height: 1.7;
+    }
+
+    /* Separación entre el texto del item y su lista anidada */
+    .slide[data-title="Entregado"] .card ul li > ul {
+      margin-top: 0.5rem;
+      margin-bottom: 1.4rem;
+    }
+
+    ul {
+      padding-left: 1.25rem;
+      margin: 0;
+      list-style: disc;
+    }
+
+    .card {
+      width: min(100%, 860px);
+      background: var(--surface);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 18px;
+      padding: 28px 34px;
+      box-shadow: 0 22px 70px var(--shadow);
+      backdrop-filter: blur(18px);
+      margin: 0 auto;
+      text-align: left;
+    }
+
+    .section-block {
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(40px) saturate(180%);
+      padding: 30px 32px;
+      margin: 0 auto 24px;
+      transition: border-color 0.3s, background 0.3s;
+    }
+
+    .section-block:hover {
+      background: rgba(255, 255, 255, 0.045);
+      border-color: rgba(255, 255, 255, 0.22);
+    }
+
+    .section-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 22px;
+    }
+
+    .section-accent {
+      width: 4px;
+      border-radius: 2px;
+      min-height: 36px;
+      flex-shrink: 0;
+    }
+
+    .section-meta {
+      min-width: 0;
+    }
+
+    .section-title {
+      font-size: 17px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      margin-bottom: 4px;
+    }
+
+    .section-desc {
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.6);
+      line-height: 1.5;
+    }
+
+    .slide-img {
+      width: min(100%, 860px);
+      max-height: 420px;
+      object-fit: contain;
+      margin: 0 auto 18px;
+      display: block;
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+    }
+
+    .roadmap {
+      margin: 0;
+      padding-left: 1.25rem;
+      list-style: none;
+    }
+
+    .roadmap li {
+      margin-bottom: 1.2rem;
+      padding-left: 0.9rem;
+      position: relative;
+      counter-increment: roadmap;
+    }
+
+    .roadmap li::before {
+      content: counter(roadmap, decimal) ".";
+      position: absolute;
+      left: 0;
+      top: 0;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    .roadmap-subtitle {
+      font-size: 0.9rem;
+      margin: 6px 0 0;
+      opacity: 0.85;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      margin-top: 8px;
+    }
+
+    .flow {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      width: min(100%, 980px);
+      margin: 18px auto 0;
+    }
+
+    .step-row {
+      display: grid;
+      grid-template-columns: 52px 1fr;
+      align-items: stretch;
+      gap: 14px;
+    }
+
+    .spine {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-top: 6px;
+    }
+
+    .spine-node {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      border: 1.5px solid rgba(255, 255, 255, 0.35);
+      flex-shrink: 0;
+      z-index: 2;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+      cursor: pointer;
+      margin-top: 18px;
+      background: rgba(0, 0, 0, 0.25);
+    }
+
+    .spine-node:hover {
+      transform: scale(1.06);
+    }
+
+    .spine-node.active {
+      box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.08);
+    }
+
+    .spine-seg {
+      width: 1.5px;
+      flex: 1;
+      min-height: 16px;
+      background: linear-gradient(to bottom, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.06));
+    }
+
+    .step-card {
+      margin: 10px 0 10px 16px;
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.025);
+      overflow: hidden;
+      transition: border-color 0.3s, background 0.3s;
+      display: flex;
+      flex-direction: column;
+    }
+
+
+    .step-card:hover {
+      border-color: rgba(255, 255, 255, 0.18);
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .step-card.active {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: rgba(255, 255, 255, 0.18);
+    }
+
+    .step-header {
+      padding: 16px 18px 12px;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .step-meta {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .step-phase {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+      color: var(--muted);
+    }
+
+    .step-title {
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: -0.015em;
+      margin-bottom: 4px;
+    }
+
+    .step-sub {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.6);
+      line-height: 1.55;
+      margin: 0;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      padding: 3px 9px;
+      border-radius: 20px;
+      white-space: nowrap;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .badge-key {
+      background: rgba(255, 59, 48, 0.12);
+      color: #FF3B30;
+      border: 1px solid rgba(255, 59, 48, 0.22);
+    }
+
+    .badge-completed {
+      background: rgba(52, 199, 89, 0.12);
+      color: #34C759;
+      border: 1px solid rgba(52, 199, 89, 0.22);
+    }
+
+    .badge-wip {
+      background: rgba(255, 149, 0, 0.12);
+      color: #FF9500;
+      border: 1px solid rgba(255, 149, 0, 0.22);
+    }
+
+    .badge-analysis {
+      background: rgba(0, 122, 255, 0.12);
+      color: #007AFF;
+      border: 1px solid rgba(0, 122, 255, 0.22);
+    }
+
+    .step-detail {
+      max-height: 0;
+      overflow: hidden;
+      opacity: 0;
+      transition: max-height 0.35s cubic-bezier(0.16,1,0.3,1), opacity 0.2s ease;
+    }
+
+    .step-detail.open {
+      max-height: 380px;
+      opacity: 1;
+    }
+
+    .step-detail-inner {
+      padding: 0 18px 18px;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      padding-top: 14px;
+    }
+
+    .expand-hint {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.55);
+      padding: 0 18px 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .expand-arrow {
+      display: inline-block;
+      transition: transform 0.25s ease;
+      font-size: 10px;
+    }
+
+    .step-card.active .expand-arrow {
+      transform: rotate(90deg);
+    }
+
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 26px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .meta li {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .hint {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 14px;
+    }
+
+    .pager {
+      position: fixed;
+      bottom: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 10px;
+      padding: 10px 12px;
+      background: rgba(5, 6, 12, 0.75);
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(14px);
+    }
+
+    .dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.35);
+      cursor: pointer;
+      transition: transform 0.2s ease, background 0.2s ease;
+    }
+
+    .dot.active {
+      background: var(--accent);
+      transform: scale(1.35);
+    }
+
+    .timeline {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      gap: 36px;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      margin-top: 24px;
+      padding: 24px 16px 0;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255, 255, 255, 0.35) transparent;
+    }
+
+    .timeline::-webkit-scrollbar {
+      height: 8px;
+    }
+
+    .timeline::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.25);
+      border-radius: 999px;
+    }
+
+    .timeline::before {
+      content: "";
+      position: absolute;
+      top: 32px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: rgba(255, 255, 255, 0.18);
+      border-radius: 1px;
+    }
+
+    .timeline-item {
+      position: relative;
+      flex: 1 1 180px;
+      min-width: 160px;
+      padding-top: 52px;
+      text-align: center;
+      background: transparent;
+      border: none;
+    }
+
+    .timeline-item::before {
+      content: "";
+      position: absolute;
+      top: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 14px;
+      height: 14px;
+      background: var(--accent);
+      border: 2px solid rgba(255, 255, 255, 0.8);
+      border-radius: 50%;
+      box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .timeline-item h3 {
+      font-size: 14px;
+      margin: 0 0 8px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .timeline-item ul {
+      margin: 0;
+      padding-left: 18px;
+      list-style: disc;
+      text-align: left;
+    }
+
+    .timeline-item ul ul {
+      margin: 6px 0 0;
+      padding-left: 18px;
+      list-style: circle;
+    }
+
+    @media (max-width: 900px) {
+      .slide {
+        padding: 42px 24px 56px;
+      }
+      .slide::before {
+        left: 24px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        scroll-behavior: auto !important;
+        transition: none !important;
+      }
+    }
+  </style>
+</head>
+<body tabindex="0">
+  <div class="slides" id="slides">
+    <section class="slide" data-title="Start">
+      <h1>Product Migration Review</h1>
+      <p class="subtitle">Unidad: Catalog · Sprint 14 · Abril 2026</p>
+
+      <div class="card">
+        <h2>Agenda</h2>
+        <ol>
+          <li>Review anterior</li>
+          <li>Sprints 15, 16 y 17</li>
+          <li>Rollout ProductStructure Zara textil</li>
+          <li>Roadmap - Próximos pasos</li>
+        </ol>
+      </div>
+
+      <div class="hint">Usa ← / → o espacio para navegar.</div>
+    </section>
+
+    <section class="slide" data-title="Review Anterior">
+      <h2>Review anterior</h2>
+      <div class="card">
+        <ul>
+          <li>Gestionar y archivar en caso de reutilización de referencias.</li>
+          <li>Utilizar las familias y subfamilias de IOP Product.</li>
+          <li>Flujo de borrados</li>
+          <li>Contingencia en Import para reprocesar los productos cuando se completen sus dependencias.</li>
+          <li>Producto 100% IOP (Sin pasar por DB2)</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Entregado">
+      <h2>Entregado</h2>
+      <div class="card">
+        <ul>
+          <li>Cargas y validaciones</li>
+          <li>Resolución de diferencias (Filtros de color, discrepancias con atributos de sku...)</li>
+          <li>Tipos de producto: Tempe, Cosmetic, Home y Gift cards</li>
+          <li>Eliminar dependencia en Reader con eventos de Single y Bundle Structure</li>
+          <li>Completar flujo de CCDeleted</li>
+        </ul>asd
+      </div>
+    </section>
+
+    <section class="slide" data-title="Rollout">
+      <h2>Rollout</h2>
+      <p class="subtitle">ProductStructure Zara textil</p>
+
+      <div class="timeline">
+        <div class="timeline-item">
+          <h3>Semana 0</h3>
+          <ul>
+            <li>Reset de datos en producción</li>
+            <li>Criterios de activación en Integrator: productos y familias</li>
+            <li>Reader y Broker consumen topic de Integrator en vez de Watcher</li>
+          </ul>
+        </div>
+        <div class="timeline-item">
+          <h3>Semana 1</h3>
+          <ul>
+            <li>Reader consume productos puntuales en Stage</li>
+            <li>Reader consume productos puntuales en Pro</li>
+          </ul>
+        </div>
+        <div class="timeline-item">
+          <h3>Semana 2</h3>
+          <ul>
+            <li>
+              Resolución de corner cases en el flujo
+            </li>
+          </ul>
+        </div>
+        <div class="timeline-item">
+          <h3>Semana 3</h3>
+          <ul>
+            <li>Activación de la primera familia completa</li>
+          </ul>
+        </div>
+        <div class="timeline-item">
+          <h3>Semana 4</h3>
+          <ul>
+            <li>Activación del 100% de familias</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Roadmap - Próximos pasos">
+      <h2>Roadmap - Próximos pasos</h2>
+      <div class="section-block">
+        <div class="flow">
+  
+          <div class="step-row">
+            <div class="spine">
+              <div class="spine-node phase-standard">1</div>
+              <div class="spine-seg"></div>
+            </div>
+            <div class="step-card phase-standard">
+              <div class="step-header">
+                <div class="step-meta">
+                  <div class="step-phase">Fase 1</div>
+                  <div class="step-title">Administración de la estructura básica de producto</div>
+                </div>
+                <span class="badge badge-completed">Completada</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="step-row">
+            <div class="spine">
+              <div class="spine-node phase-standard">2.1</div>
+              <div class="spine-seg"></div>
+            </div>
+            <div class="step-card phase-standard">
+              <div class="step-header">
+                <div class="step-meta">
+                  <div class="step-phase">Fase 2.1</div>
+                  <div class="step-title">ProductStructure Zara textil</div>
+                </div>
+                <span class="badge badge-wip">WIP - Implantación</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="step-row">
+            <div class="spine">
+              <div class="spine-node">2.2</div>
+              <div class="spine-seg"></div>
+            </div>
+            <div class="step-card">
+              <div class="step-header">
+                <div class="step-meta">
+                  <div class="step-phase">Fase 2.2</div>
+                  <div class="step-title">ProductStructure Zara todo tipos de producto</div>
+                </div>
+                <span class="badge badge-wip">WIP - Implantación</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="step-row">
+            <div class="spine">
+              <div class="spine-node phase-standard">2.3</div>
+              <div class="spine-seg"></div>
+            </div>
+            <div class="step-card phase-standard">
+              <div class="step-header">
+                <div class="step-meta">
+                  <div class="step-phase">Fase 2.3</div>
+                  <div class="step-title">Apagar Pumba de atributos de estructura</div>
+                </div>
+                <span class="badge badge-wip">WIP</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="step-row">
+            <div class="spine">
+              <div class="spine-node">2.4</div>
+              <div class="spine-seg"></div>
+            </div>
+            <div class="step-card">
+              <div class="step-header">
+                <div class="step-meta">
+                  <div class="step-phase">Fase 2.4</div>
+                  <div class="step-title">Eliminar dependencia en Reader del SingleComponentStructure de Watcher</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="step-row">
+            <div class="spine">
+              <div class="spine-node">2.5</div>
+              <div class="spine-seg"></div>
+            </div>
+            <div class="step-card">
+              <div class="step-header">
+                <div class="step-meta">
+                  <div class="step-phase">Fase 2.5</div>
+                  <div class="step-title">Eliminar dependencia en Reader del BundleComponentStructure de Watcher</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="step-row">
+            <div class="spine">
+              <div class="spine-node">2.6</div>
+              <div class="spine-seg"></div>
+            </div>
+            <div class="step-card">
+              <div class="step-header">
+                <div class="step-meta">
+                  <div class="step-phase">Fase 2.6</div>
+                  <div class="step-title">Eliminar dependencia de KPI con Watcher</div>
+                </div>
+                <span class="badge badge-analysis">En análisis</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="step-row">
+            <div class="spine">
+              <div class="spine-node">2.7</div>
+            </div>
+            <div class="step-card">
+              <div class="step-header">
+                <div class="step-meta">
+                  <div class="step-phase">Fase 2.7</div>
+                  <div class="step-title">Apagar evento CCDeleted</div>
+                </div>
+                <span class="badge badge-key">Apagado Watcher de estructura</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="step-row">
+            <div class="spine">
+              <div class="spine-node">3</div>
+            </div>
+            <div class="step-card">
+              <div class="step-header">
+                <div class="step-meta">
+                  <div class="step-phase">Fase 3</div>
+                  <div class="step-title">Apagado de estructura en cadenas o extended info en Zara</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <nav class="pager" id="pager"></nav>
+
+  <script>
+    const slides = Array.from(document.querySelectorAll('.slide'));
+    const slidesEl = document.getElementById('slides');
+    const pager = document.getElementById('pager');
+    let current = 0;
+
+    // Ensure the grid knows how many columns it needs
+    slidesEl.style.setProperty('--count', slides.length);
+
+    const setActive = index => {
+      current = (index + slides.length) % slides.length;
+      const offset = current * window.innerWidth;
+      slidesEl.scrollTo({ left: offset, behavior: 'smooth' });
+      updateDots();
+      window.history.replaceState({}, '', `#slide-${current + 1}`);
+    };
+
+    const updateDots = () => {
+      pager.querySelectorAll('.dot').forEach((dot, idx) => {
+        dot.classList.toggle('active', idx === current);
+      });
+    };
+
+    const createPager = () => {
+      slides.forEach((_, idx) => {
+        const dot = document.createElement('div');
+        dot.className = 'dot';
+        dot.addEventListener('click', () => setActive(idx));
+        pager.appendChild(dot);
+      });
+      updateDots();
+    };
+
+    const handleKey = event => {
+      const keys = ['ArrowRight', 'ArrowLeft', 'PageDown', 'PageUp', ' '];
+      if (!keys.includes(event.key)) return;
+      event.preventDefault();
+
+      if (event.key === 'ArrowRight' || event.key === ' ' || event.key === 'PageDown') {
+        setActive(current + 1);
+      }
+      if (event.key === 'ArrowLeft' || event.key === 'PageUp') {
+        setActive(current - 1);
+      }
+    };
+
+    const init = () => {
+      createPager();
+      window.addEventListener('keydown', handleKey);
+      const hash = window.location.hash.match(/slide-(\d+)/);
+      if (hash) {
+        const idx = Number(hash[1]) - 1;
+        if (!Number.isNaN(idx) && idx >= 0 && idx < slides.length) {
+          current = idx;
+        }
+      }
+      setTimeout(() => setActive(current), 50);
+      window.addEventListener('resize', () => setActive(current));
+      document.body.focus();
+    };
+
+    init();
+
+  </script>
+</body>
+</html>
