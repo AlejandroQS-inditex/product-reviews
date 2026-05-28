@@ -222,6 +222,29 @@
   .usecase-item { display: flex; align-items: flex-start; gap: 8px; font-size: 13px; color: var(--text-secondary); line-height: 1.5; }
   .usecase-bullet { width: 4px; height: 4px; border-radius: 50%; background: var(--text-tertiary); flex-shrink: 0; margin-top: 7px; }
 
+  /* ── NEXT STEPS GRID ── */
+  .next-steps-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  @media (max-width: 1024px) { .next-steps-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 600px) { .next-steps-grid { grid-template-columns: 1fr; } }
+  .next-step-card { border-radius: 16px; padding: 24px; border: 1px solid var(--border); transition: all 0.4s cubic-bezier(0.16,1,0.3,1); position: relative; overflow: hidden; }
+  .next-step-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, currentColor 0%, transparent 100%); opacity: 0; transition: opacity 0.3s ease; }
+  .next-step-card:hover { border-color: var(--border-strong); transform: translateY(-4px); }
+  .next-step-card:hover::before { opacity: 1; }
+  .next-step-icon { font-size: 32px; margin-bottom: 12px; display: block; }
+  .next-step-title { font-size: 14px; font-weight: 600; color: var(--text-primary); line-height: 1.5; letter-spacing: -0.015em; }
+  
+  .next-step-card.card-rollout { background: linear-gradient(135deg, rgba(0,122,255,0.08) 0%, rgba(0,122,255,0.02) 100%); border-color: rgba(0,122,255,0.15); color: var(--accent-blue); }
+  .next-step-card.card-rollout:hover { background: linear-gradient(135deg, rgba(0,122,255,0.12) 0%, rgba(0,122,255,0.05) 100%); border-color: rgba(0,122,255,0.3); }
+  
+  .next-step-card.card-attributes { background: linear-gradient(135deg, rgba(52,199,89,0.08) 0%, rgba(52,199,89,0.02) 100%); border-color: rgba(52,199,89,0.15); color: var(--accent-green); }
+  .next-step-card.card-attributes:hover { background: linear-gradient(135deg, rgba(52,199,89,0.12) 0%, rgba(52,199,89,0.05) 100%); border-color: rgba(52,199,89,0.3); }
+  
+  .next-step-card.card-personalization { background: linear-gradient(135deg, rgba(191,90,242,0.08) 0%, rgba(191,90,242,0.02) 100%); border-color: rgba(191,90,242,0.15); color: var(--accent-purple); }
+  .next-step-card.card-personalization:hover { background: linear-gradient(135deg, rgba(191,90,242,0.12) 0%, rgba(191,90,242,0.05) 100%); border-color: rgba(191,90,242,0.3); }
+  
+  .next-step-card.card-chain { background: linear-gradient(135deg, rgba(255,149,0,0.08) 0%, rgba(255,149,0,0.02) 100%); border-color: rgba(255,149,0,0.15); color: var(--accent-orange); }
+  .next-step-card.card-chain:hover { background: linear-gradient(135deg, rgba(255,149,0,0.12) 0%, rgba(255,149,0,0.05) 100%); border-color: rgba(255,149,0,0.3); }
+
   /* ── COLLAPSIBLE ── */
   .collapsible-step {
     cursor: pointer;
@@ -280,6 +303,7 @@
     <a class="nav-link" href="#entidad">Modelo intermedio</a>
     <a class="nav-link" href="#flujo">Nuevo modelo</a>
     <a class="nav-link" href="#problemas">Problemas</a>
+    <a class="nav-link" href="#siguientes-pasos">Siguientes pasos</a>
   </div>
 </nav>
 
@@ -289,7 +313,7 @@
   <div class="hero reveal">
     <div class="hero-eyebrow">
       <span class="hero-tag">Product Migration status</span>
-      <span class="hero-date">11 de mayo de 2026</span>
+      <span class="hero-date">28 de mayo de 2026</span>
     </div>
     <h1 class="hero-title">Actualización de la migración de ProductCore</h1>
     <p class="hero-subtitle">Resumen del estado actual de la migración de ProductCore y apagado del DB2, problemas que han surgido y siguientes pasos</p>
@@ -332,7 +356,7 @@
         <tr>
           <td class="td-label">Media</td>
           <td><span class="pill pill-green">Apagado</span></td>
-          <td><span class="pill pill-orange">Rollout en progreso</span></td>
+          <td><span class="pill pill-green">Apagado</span></td>
         </tr>
         <tr>
           <td class="td-label">Structure</td>
@@ -456,19 +480,26 @@
       <div class="flow-step">
         <div class="flow-num flow-num-red">2</div>
         <div>
+          <div class="flow-actor" style="color:var(--accent-red);">IOP Producto</div>
+          <div class="flow-desc">Entender su modelo, conseguir los accesos, integración, ACLs...</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num flow-num-red">3</div>
+        <div>
           <div class="flow-actor" style="color:var(--accent-red);">Dificultad de atemporalizar</div>
           <div class="flow-desc">Sistemas temporales vs nuevo modelo atemporal: información temporal, atributos... -> <b>SCOPE</b></div>
         </div>
       </div>
       <div class="flow-step">
-        <div class="flow-num flow-num-red">3</div>
+        <div class="flow-num flow-num-red">4</div>
         <div>
           <div class="flow-actor" style="color:var(--accent-red);">Hermanados</div>
           <div class="flow-desc">Permitir grupos de hermanos distintos por campaña y pensar que esta solución tiene que valer para Commercial options y components.</div>
         </div>
       </div>
       <div class="flow-step collapsible-step">
-        <div class="flow-num flow-num-red">4</div>
+        <div class="flow-num flow-num-red">5</div>
         <div>
           <div class="flow-actor" style="color:var(--accent-red);">Reutilizaciones</div>
           <div class="flow-desc">Reutilización de referencias para productos distintos</div>
@@ -481,17 +512,10 @@
         </div>
       </div>
       <div class="flow-step">
-        <div class="flow-num flow-num-red">5</div>
+        <div class="flow-num flow-num-red">6</div>
         <div>
           <div class="flow-actor" style="color:var(--accent-red);">Maestros, Ecomload, Pumbas y "procesos ocultos"</div>
           <div class="flow-desc">Comportamientos legacy de Maestros, enviar los eventos desde Ecomload y detectar Pumbas y procesos ocultos del commerce</div>
-        </div>
-      </div>
-      <div class="flow-step">
-        <div class="flow-num flow-num-red">6</div>
-        <div>
-          <div class="flow-actor" style="color:var(--accent-red);">IOP Producto</div>
-          <div class="flow-desc">Entender su modelo, conseguir los accesos, integración, ACLs...</div>
         </div>
       </div>
       <div class="flow-step">
@@ -504,11 +528,41 @@
     </div>
   </div>
 
+  <!-- SIGUIENTES PASOS -->
+  <div id="siguientes-pasos" class="section-card surface reveal">
+    <div class="section-header">
+      <div class="section-accent" style="background: var(--accent-green);"></div>
+      <div>
+        <div class="section-title">Siguientes pasos</div>
+        <div class="section-desc">Hitos clave para completar la migración</div>
+      </div>
+    </div>
+
+    <div class="next-steps-grid">
+      <div class="next-step-card card-rollout">
+        <span class="next-step-icon">🚀</span>
+        <div class="next-step-title">Rollout: implantar estructura en Zara</div>
+      </div>
+      <div class="next-step-card card-attributes">
+        <span class="next-step-icon">💾</span>
+        <div class="next-step-title">Cargar atributos de producto sin usar el Pumba que alinea DB2 e IOP</div>
+      </div>
+      <div class="next-step-card card-personalization">
+        <span class="next-step-icon">🎨</span>
+        <div class="next-step-title">Personalización</div>
+      </div>
+      <div class="next-step-card card-chain">
+        <span class="next-step-icon">🏭</span>
+        <div class="next-step-title">Implantar estructura en una cadena</div>
+      </div>
+    </div>
+  </div>
+
 
 
   <!-- FOOTER -->
   <div style="text-align:center; padding-top:40px; border-top: 1px solid var(--border);">
-    <p style="font-size:12px; color:var(--text-tertiary);">Product Reviews · Visión de Migración de Product Reviews · <a href="#" target="_blank" rel="noopener noreferrer" style="color:inherit; text-decoration:underline;">PRODUCT-XXXX</a> · Abril 2026</p>
+    <p style="font-size:12px; color:var(--text-tertiary);">Product Migration - Mayo 2026</p>
   </div>
 
 </div>
@@ -559,7 +613,7 @@
   });
 
   // Nav active on scroll
-  const sections = ['vision','entidad','flujo','problemas'];
+  const sections = ['vision','entidad','flujo','problemas','siguientes-pasos'];
   window.addEventListener('scroll', () => {
     let current = '';
     sections.forEach(id => {
